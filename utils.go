@@ -56,7 +56,26 @@ func EntryToRequest(entry *Entry, ignoreHarCookies bool) (*http.Request, error) 
 		body = form.Encode()
 	}
 
-	req, _ := http.NewRequest(entry.Request.Method, entry.Request.URL, bytes.NewBuffer([]byte(body)))
+ 	u, err := url.Parse(entry.Request.URL)
+
+        if(err!=nil){
+          return nil, err
+        }
+ 
+ 	if len(entry.Request.QueryString) > 0 {
+ 		if(err!=nil){
+ 			return nil, err
+ 		}
+ 
+ 		q := u.Query()
+ 		for _, p := range entry.Request.QueryString {
+ 			q.Set(p.Name, p.Value)
+ 		}
+ 
+ 		u.RawQuery = q.Encode()
+ 	}
+ 
+ 	req, _ := http.NewRequest(entry.Request.Method, u.String(), bytes.NewBuffer([]byte(body)))
 
 	for _, h := range entry.Request.Headers {
 		if httpguts.ValidHeaderFieldName(h.Name) && httpguts.ValidHeaderFieldValue(h.Value) && h.Name != "Cookie" {
