@@ -1,4 +1,4 @@
-module github.com/mrichman/hargo
+module github.com/fabled-se/hargo
 
 go 1.13
 
